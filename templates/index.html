@@ -1,0 +1,191 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Scraper App</title>
+</head>
+<body>
+    <h1>News Scraper App</h1>
+    <form id="dataForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="interests">Interests (comma-separated):</label>
+        <input type="text" id="interests" name="interests" required><br><br>
+        <label for="location">Location (Zip Code):</label>
+        <input type="text" id="location" name="location" required><br><br>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="responseMessage"></div>
+
+    <div id="linksContainer"></div>
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+            
+            const email = document.getElementById('email').value;
+            const interests = document.getElementById('interests').value.split(',').map(i => i.trim());
+            const location = document.getElementById('location').value;
+
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, interests: interests, location: location })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('responseMessage').innerText = data.message;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('responseMessage').innerText = 'An error occurred.';
+            });
+        });
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Scraper App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #articlesContainer {
+            margin-top: 20px;
+        }
+        .article {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .article a {
+            text-decoration: none;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Animal News in your Area!</h1>
+    <form id="dataForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="interests">Interests (comma-separated):</label>
+        <select id="interests" name="interests" required>
+            <option value="">--Select an Interest--</option>
+            <option value="fish">Fish</option>
+            <option value="dogs">Dogs</option>
+            <option value="cats">Cats</option>
+            <option value="Animal Advocacy">Animal Advocacy</option>
+            <option value="Animal Abuse">Animal Abuse</option>
+            <option value="Animal Rights">Animal Rights</option>
+        </select><br><br>
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required><br><br>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="responseMessage"></div>
+    <!-- <div id="linksContainer"></div> Container for displaying links -->
+    <div id="articlesContainer"></div>
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+            
+            const email = document.getElementById('email').value;
+            const interests = document.getElementById('interests').value.split(',').map(i => i.trim());
+            const location = document.getElementById('location').value; // Get the location value
+    
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email, interests: interests, location: location }) // Include location
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Display the thank you message
+                document.getElementById('responseMessage').innerText = data.message;
+    
+                // Display the articles with titles, sources, and links
+                const articlesContainer = document.getElementById('articlesContainer');
+                articlesContainer.innerHTML = ''; // Clear previous articles
+                if (data.ArticleInformation.length === 0) {
+                    articlesContainer.innerHTML = '<p>No articles found.</p>';
+                } else {
+                    data.ArticleInformation.forEach(article => {
+                        const articleElement = document.createElement('div');
+                        articleElement.className = 'article'; // Add a class for styling
+                        articleElement.innerHTML = `
+                            <strong>Title:</strong> ${article.title} <br>
+                            <strong>Source:</strong> ${article.source} <br>
+                            <strong>Key Words:</strong> ${article.KeyWords} <br>
+                            <strong>Locations:</strong> ${article.Locations} <br>
+                            <strong>Link:</strong> <a href="${article.link}" target="_blank">${article.link}</a>
+                        `;
+                        articlesContainer.appendChild(articleElement);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('responseMessage').innerText = 'An error occurred.';
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+// <!-- <script>
+    //     document.getElementById('dataForm').addEventListener('submit', function(event) {
+    //         event.preventDefault(); // Prevent the form from submitting the traditional way
+            
+    //         const email = document.getElementById('email').value;
+    //         const interests = document.getElementById('interests').value.split(',').map(i => i.trim());
+
+    //         fetch('/submit', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify({ email: email, interests: interests, location: location })
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Display the thank you message
+    //             document.getElementById('responseMessage').innerText = data.message;
+
+    //             // Display the articles with titles, sources, and links
+    //             const articlesContainer = document.getElementById('articlesContainer');
+    //             articlesContainer.innerHTML = ''; // Clear previous articles
+    //             data.articles.forEach(article => {
+    //                 const articleElement = document.createElement('div');
+    //                 articleElement.className = 'article'; // Add a class for styling
+    //                 articleElement.innerHTML = `
+    //                     <strong>Title:</strong> ${article.title} <br>
+    //                     <strong>Source:</strong> ${article.source} <br>
+    //                     <strong>Link:</strong> <a href="${article.link}" target="_blank">${article.link}</a>
+    //                 `;
+    //                 articlesContainer.appendChild(articleElement);
+    //             });
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //             document.getElementById('responseMessage').innerText = 'An error occurred.';
+    //         });
